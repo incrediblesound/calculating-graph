@@ -17,4 +17,4 @@ Each node has a function and a condition object. When the input method of the no
 
 Graph
 -----
-The graph has an input function that takes any amount of arguments and passes them into the input function of every node in the graph. It acucmulates the outputs in a object which is returned at the end.
+The graph has an input function that takes any amount of arguments and passes them into the input function of every node in the graph. It acucmulates the outputs in a object which is returned at the end. The graph also stores a map of input types to false outputs for each node, but that feature is in development as of now.
