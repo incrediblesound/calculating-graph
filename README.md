@@ -31,10 +31,17 @@ var node = new Node(new Condition('number'), function(args){
   })
 // this node returns the sum of any amount of numbers
 ```
+Otherwise, use a number and a set of types along with a function that can process those arguments:
+```javascript
+var node = new Node(new Condition(3, 'string', 'string', 'number'), function(name, category, value){
+  return {name: name, category: category, value: value};
+})
+// returns a formatted object when given two strings and a number
+```
 
 Graph
 -----
-The graph has an input function that takes any amount of arguments and passes them into the input function of every node in the graph. The graph acucmulates the outputs in a object which is returned at the end, and stores an object with input types mapped to proportion of false outputs.
+The graph has an input function that takes any amount of arguments and passes them into the input function of every node in the graph. The graph acucmulates the outputs in a object which is returned at the end, and stores an object with input types mapped to proportion of false outputs for each node.
 
 Lets say we create three nodes like this:
 
@@ -72,7 +79,7 @@ concat: {
   number, number: 0
   },
 square: {
-  number: 0,
+  number: 1,
   number, number: 0
   }
 }
