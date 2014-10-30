@@ -13,10 +13,23 @@ You can add a function to the condition object with the addFunc() method. If the
 
 Nodes
 -----
-Each node has a node function and a condition object. When the input method of the node is run with a set of arguments, it first puts those arguments into the check method of the condition object. If the check method returns true, it passes the arguments into the node function. The input method will return false if the check method fails, otherwise it will return the result of the node function. If you want your node to process the arguments no matter how many there are or what type they are, you simply don't pass arguments to the condition object that you create with the node:
+Each node has a node function and a condition object. When the input method of the node is run with a set of arguments, it first puts those arguments into the check method of the condition object. If the check method returns true, it passes the arguments into the node function. The input method will return false if the check method fails, otherwise it will return the result of the node function. 
+
+If you want your node to process the arguments no matter how many there are or what type they are, you simply don't pass arguments to the condition object that you create with the node:
 ```javascript
 var node = new Node(new Condition(), function(args){ return args })
 // this node returns whatever arguments it is given
+```
+If you want you node to process an indefinite number of arguments, simply pass one type into the condition:
+```javascript
+var node = new Node(new Condition('number'), function(args){
+    var result = 0;
+    for(var i = 0; i < args.length; i++){
+      result += args[i];
+    }
+    return result;
+  })
+// this node returns the sum of any amount of numbers
 ```
 
 Graph
