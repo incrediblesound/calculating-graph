@@ -33,7 +33,10 @@ var node = new Node(new Condition('number'), function(args){
 ```
 Otherwise, use a number and a set of types along with a function that can process those arguments:
 ```javascript
-var node = new Node(new Condition(3, 'string', 'string', 'number'), function(name, category, value){
+var node = new Node(new Condition(3, 'string', 'string', 'number'), function(args){
+  var name = args[0];
+  var category = args[1];
+  var value = args[2];
   return {name: name, category: category, value: value};
 })
 // returns a formatted object when given two strings and a number
@@ -45,12 +48,32 @@ The graph has an input function that takes any amount of arguments and passes th
 
 Lets say we create three nodes like this:
 
-<strong>("add")</strong> condition: this node only accepts two numbers, func: return sum of two numbers    
-<strong>("concat")</strong> condition: this node only accepts two strings, func: return concat of two strings    
-<strong>("square")</strong> condition: this node only accepts one number, func: return square of one number
-
-If we add these three nodes to the graph, then we see this behavior:
 ```javascript
+var node1 = new Node(new Condition(2, 'number', 'number'), 
+  function(args){
+    var a = args[0];
+    var b = args[1];
+    return a + b;
+  })
+var node2 = new Node(new Condition(2, 'string', 'string'),
+  function(args){
+    var a = args[0];
+    var b = args[1];
+    return a.concat(b);
+  })
+var node3 = new Node(new Condition(1, 'number'),
+  function(args){
+    var a = args[0];
+    return a * a;
+  })
+```
+Then we add these three nodes to the graph and give it an input:
+```javascript
+// insert takes a node and an optional name argument for clarity of output
+graph.insert(node1, 'add');
+graph.insert(node2, 'concat');
+graph.insert(node3, 'square');
+// give our graph a single integer
 graph.input(3)
 ```
 This input results in the following object:
