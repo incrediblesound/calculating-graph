@@ -28,9 +28,9 @@ describe('connect()', function () {
       return (args[0] < 10);
     })
 
-    graph.insert(node1);
-    graph.insert(node2);
-    graph.insert(node3);
+    graph.insert(node1, 'add');
+    graph.insert(node2, 'concat');
+    graph.insert(node3, 'square');
     window.graph = graph;
     // end beforeEach
   });

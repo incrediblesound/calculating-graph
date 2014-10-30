@@ -4,85 +4,54 @@ var Graph = function(){
   this.map = {};
 }
 
-var Condition = function(){
-  var args = Array.prototype.slice.call(arguments);
-  this.length = args.shift();
-  this.types = args;
-  this.func = undefined;
-}
-
-Condition.prototype.addFunc = function(func){
-  this.func = func;
-}
-
-Condition.prototype.check = function(args){
-  if(this.length && args.length !== this.length){
-    return false;
-  } else {
-    var argument, type;
-    for(var i = 0; i < args.length; i++){ // this should be replaced by deep equals
-      argument = args[i];
-      type = this.length ? this.types[i] : this.types[0]; // if no length is given, check arguments against single type
-      if(typeof argument !== type){
-        return false;
-      }
-    }
-    return this.func ? this.func(args) : true;
-  }
-}
-
-var Node = function(condition, func){
-  this.id = null;
-  this.condition = condition;
-  this.func = func;
-  this.edges = [];
-}
-
-Node.prototype.addEdge = function(node){
-  if(this.edges.indexOf(node.id) === -1){
-    this.edges.push(node.id);
-    return true;
-  } else {
-    return false;
-  }
-}
-
-Node.prototype.input = function(args){
-  if(this.condition.check(args)){
-    return this.func(args);
-  } else {
-    return false;
-  }
-}
-
-Graph.prototype.insert = function(node){
+Graph.prototype.insert = function(node, name){
   var id = this.count;
   node.id = id;
-  this.map[id] = {};
+  node.name = name;
+  this.map[name || id] = {};
   this.nodes.push(node);
   this.count++;
 }
 
 Graph.prototype.connect = function(source, target){
+  sourceNode = this.getNode(source);
   sourceNode.addEdge(target);
-  targetNode.addEdge(source);
 }
 
 Graph.prototype.input = function(){
   var args = Array.prototype.slice.call(arguments);
-  var types = this.generateTypes(args);
-  var node, output;
+  var types;
+  var output, secondOutput;
+  var self = this;
   var results = {};
-  for(var i = 0; i < this.nodes.length; i++){
-    node = this.nodes[i];
-    output = node.input(args);
-    if(output === false){
-      this.storeAverage(types, this.map[node.id], 0);
+  var storeOutput = function(val, node, from){
+    var key = node.name || node.id
+    if(val === false){
+      self.storeAverage(types, self.map[key], 0);
     } else {
-      this.storeAverage(types, this.map[node.id], 1);
+      self.storeAverage(types, self.map[key], 1);
     }
-    results[node.id] = output;
+    results[key] = results[key] || [];
+    if(from){
+      results[key].push({from: from.name || from.id, value: val});
+    } else {
+      results[key].push(val);
+    }
   }
+  forEach(this.nodes, function(node){
+    types = self.generateTypes(args);
+    output = node.input(args);
+    storeOutput(output, node);
+    if(!Array.isArray(output)){
+      output = [output];
+    }
+    forEach(node.edges, function(edge){
+      types = self.generateTypes(output);
+      edge = self.getNode(edge);
+      secondOutput = edge.input(output);
+      storeOutput(secondOutput, edge, node);
+    })
+  })
   return results;
 }
 
@@ -117,6 +86,20 @@ Graph.prototype.getMap = function(){
     })
   })
   return result;
+}
+
+Graph.prototype.getNode = function(id){
+  if(id === 'graph'){
+    return this;
+  } else {
+    var result;
+    forEach(this.nodes, function(node){
+      if(node.id === id || node.name === id){
+        result = node;
+      }
+    })
+    return result;
+  }
 }
 
 function forEach(obj, fn){
