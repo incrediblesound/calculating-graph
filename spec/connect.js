@@ -25,7 +25,7 @@ describe('connect()', function () {
         return a * a;
       })
     node3.condition.addFunc(function(args){
-      return (args[0] < 10)
+      return (args[0] < 10);
     })
 
     graph.insert(node1);

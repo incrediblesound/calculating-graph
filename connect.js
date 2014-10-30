@@ -22,7 +22,7 @@ Condition.prototype.check = function(args){
     var argument, type;
     for(var i = 0; i < args.length; i++){ // this should be replaced by deep equals
       argument = args[i];
-      type = this.types[i];
+      type = this.length ? this.types[i] : this.types[0]; // if no length is given, check arguments against single type
       if(typeof argument !== type){
         return false;
       }
@@ -70,25 +70,64 @@ Graph.prototype.connect = function(source, target){
 
 Graph.prototype.input = function(){
   var args = Array.prototype.slice.call(arguments);
+  var types = this.generateTypes(args);
   var node, output;
   var results = {};
   for(var i = 0; i < this.nodes.length; i++){
     node = this.nodes[i];
     output = node.input(args);
     if(output === false){
-      this.storeAverage(args, this.map[node.id], 0);
+      this.storeAverage(types, this.map[node.id], 0);
     } else {
-      this.storeAverage(args, this.map[node.id], 1);
+      this.storeAverage(types, this.map[node.id], 1);
     }
     results[node.id] = output;
   }
   return results;
 }
 
-Graph.prototype.storeAverage = function(args, store, num){
-  var arr = [];
+Graph.prototype.generateTypes = function(args){
+  var result = [];
   for(var i = 0; i < args.length; i++){
-    arr.push(typeof args[i]);
+    result.push(typeof args[i]);
   }
-  store[arr] = store[arr] ? ((store[arr] + num) / 2) : num;
+  return result;
+}
+
+Graph.prototype.storeAverage = function(types, store, num){
+  store[types] = store[types] || [];
+  store[types].push(num);
+}
+
+Graph.prototype.getMap = function(){
+  var result = {}, self = this;
+  var keys = Object.keys(this.map)
+  var key;
+  var avg = function(arr){
+    var result = 0;
+    forEach(arr, function(element){
+      result += element;
+    })
+    return result/arr.length;
+  }
+  forEach(this.map, function(store, storeKey){
+    forEach(store, function(typeSet, typeSetKey){
+      result[storeKey] = result[storeKey] || {};
+      result[storeKey][typeSetKey] = avg(typeSet);
+    })
+  })
+  return result;
+}
+
+function forEach(obj, fn){
+  if(Array.isArray(obj)){
+    for(var i = 0; i < obj.length; i++){
+      fn(obj[i], i);
+    }
+  } else {
+    var keys = Object.keys(obj);
+    for(var i = 0; i < keys.length; i++){
+      fn(obj[keys[i]], keys[i]);
+    }
+  }
 }
