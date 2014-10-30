@@ -17,4 +17,58 @@ Each node has a function and a condition object. When the input method of the no
 
 Graph
 -----
-The graph has an input function that takes any amount of arguments and passes them into the input function of every node in the graph. It acucmulates the outputs in a object which is returned at the end. The graph also stores a map of input types to false outputs for each node, but that feature is in development as of now.
+The graph has an input function that takes any amount of arguments and passes them into the input function of every node in the graph. The graph acucmulates the outputs in a object which is returned at the end, and stores an object with input types mapped to proportion of false outputs.
+
+Lets say we create three nodes like this:
+
+<strong>"add"</strong> condition: this node only accepts two numbers, func: return sum of two numbers    
+<strong>"concat"</strong> condition: this node only accepts two strings, func: return concat of two strings    
+<strong>"square"</strong> condition: this node only accepts one number, func: return square of one number
+
+If we add these three nodes to the graph, then we see this behavior:
+```javascript
+graph.input(3)
+/* this input results in the following object:
+{
+add: [ false ],
+concat: [ false ],
+square: [ 9 ]
+}
+*/
+graph.input(3, 3)
+/* now we have this:
+{
+add: [ 6 ],
+concat: [ false ],
+square: [ false ]
+}
+
+and our graph.getMap() function returns this:
+{
+add: {
+  number: 0,
+  number, number: 1,
+  },
+concat: {
+  number: 0,
+  number, number: 0
+  },
+square: {
+  number: 0,
+  number, number: 0
+  }
+}
+```
+There is also the ability to add one-directional connections to the graph. Lets say we want the result of every addition to be squared, we would simply do this:
+```javascript
+graph.connect('add','square');
+graph.input(3, 3);
+/* now our result is a little different:
+{
+add: [ 6 ],
+concat: [ false ],
+square: [ { from: 'add', value: 36 }, false ]
+}
+*/
+```
+The return value from add was passed to the square node via the one-way connection, and the result is included in the output object with some additional info about the origin of the input value.
