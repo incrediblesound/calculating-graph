@@ -7,13 +7,17 @@ Lets start from the inside out:
 
 Conditions
 ----------
-A condition object takes a length number and a series of types. When you pass an array of arguments into its check function it first checks if the length of the arguments array matches the length number of the condition. Next it checks if the types of the arguments matches the types of the condition. If all these conditions are met then the check function returns true.
+A condition object takes a length number and a series of types. When you pass an array of arguments into its check function it first checks if the length of the arguments array matches the length property of the condition. Next it checks if the types of the arguments matches the types property of the condition. If no length is given the condition will assume there is only one type and check each argument against condition.types[0]. If all these conditions are met then the check function returns true and the arguments are passed on to the node function.
 
 You can add a function to the condition object with the addFunc() method. If there is a function on the condition it will return the result of invoking that function with the argments as a last check instead of returning true.
 
 Nodes
 -----
-Each node has a function and a condition object. When the input method of the node is run with a set of arguments, it first puts those arguments into the check method of the condition object. If the check method returns true, it passes the arguments into the function on the node. The input method will return false if the check method fails, otherwise it will return the result of the node function.
+Each node has a node function and a condition object. When the input method of the node is run with a set of arguments, it first puts those arguments into the check method of the condition object. If the check method returns true, it passes the arguments into the node function. The input method will return false if the check method fails, otherwise it will return the result of the node function. If you want your node to process the arguments no matter how many there are or what type they are, you simply don't pass arguments to the condition object that you create with the node:
+```javascript
+var node = new Node(new Condition(), function(args){ return args })
+// this node returns whatever arguments it is given
+```
 
 Graph
 -----
@@ -21,9 +25,9 @@ The graph has an input function that takes any amount of arguments and passes th
 
 Lets say we create three nodes like this:
 
-<strong>"add"</strong> condition: this node only accepts two numbers, func: return sum of two numbers    
-<strong>"concat"</strong> condition: this node only accepts two strings, func: return concat of two strings    
-<strong>"square"</strong> condition: this node only accepts one number, func: return square of one number
+<strong>("add")</strong> condition: this node only accepts two numbers, func: return sum of two numbers    
+<strong>("concat")</strong> condition: this node only accepts two strings, func: return concat of two strings    
+<strong>("square")</strong> condition: this node only accepts one number, func: return square of one number
 
 If we add these three nodes to the graph, then we see this behavior:
 ```javascript
