@@ -28,22 +28,23 @@ Lets say we create three nodes like this:
 If we add these three nodes to the graph, then we see this behavior:
 ```javascript
 graph.input(3)
-/* this input results in the following object:
+```
+This input results in the following object:
+```javascript
 {
 add: [ false ],
 concat: [ false ],
 square: [ 9 ]
 }
-*/
+// lets try two numbers:
 graph.input(3, 3)
-/* now we have this:
 {
 add: [ 6 ],
 concat: [ false ],
 square: [ false ]
 }
 
-and our graph.getMap() function returns this:
+/// and our graph.getMap() function returns this:
 {
 add: {
   number: 0,
@@ -63,12 +64,13 @@ There is also the ability to add one-directional connections to the graph. Lets 
 ```javascript
 graph.connect('add','square');
 graph.input(3, 3);
-/* now our result is a little different:
+```
+This time our result is a little different:
+```javascript
 {
 add: [ 6 ],
 concat: [ false ],
 square: [ { from: 'add', value: 36 }, false ]
 }
-*/
 ```
 The return value from add was passed to the square node via the one-way connection, and the result is included in the output object with some additional info about the origin of the input value.
