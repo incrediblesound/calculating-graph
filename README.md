@@ -7,9 +7,22 @@ Lets start from the inside out:
 
 Conditions
 ----------
-A condition object takes a length number and a series of types. When you pass an array of arguments into its check function it first checks if the length of the arguments array matches the length property of the condition. Next it checks if the types of the arguments matches the types property of the condition. If no length is given the condition will assume there is only one type and check each argument against condition.types[0]. If all these conditions are met then the check function returns true and the arguments are passed on to the node function.
+A condition object is instantiated with a "length" number and zero or more types. Like this:
+```javascript
+var condition1 = new Condition(2, 'string', 'number'); // returns true for two arguments, a string and a number
+var condition2 = new Condition('string'); // returns true for any number of strings
+var condition3 = new Condition(1, 'number'); // returns true for one number
+```
+When you pass an array of arguments into the "check" method on the condition object it will first check if the length of the arguments array matches the length number. If that passes, it checks if the types of the arguments matches the types of the condition. If no length is given the condition will assume there is only one type and check each argument against that. If all these conditions are met then the check function returns true.
 
-You can add a function to the condition object with the addFunc() method. If there is a function on the condition it will return the result of invoking that function with the argments as a last check instead of returning true.
+You can also add a function to the condition object with the addFunc() method. If there is a function on the condition object then the check method will return the result of invoking that function with the argments as a last check if the others all pass.
+```javascript
+var condition3 = new Condition(1, 'number');
+condition3.addFunc(function(args){ return (args[0] < 10) })
+condition3.check([3]) //=> true, one number less than ten
+condition3.check([3,4]) //=> false, two numbers
+condition3.check([11]) //=> false, one number greater than ten
+```
 
 Nodes
 -----
