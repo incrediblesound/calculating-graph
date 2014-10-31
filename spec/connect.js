@@ -3,7 +3,7 @@
 describe('connect()', function () {
   'use strict';
   var graph;
-  var node1, node2, node3;
+  var node1, node2, node3, node4;
 
   beforeEach(function () {
     graph = new Graph();
@@ -27,10 +27,18 @@ describe('connect()', function () {
     node3.condition.addFunc(function(args){
       return (args[0] < 10);
     })
+    node4 = new Node(new Condition('number'), function(args){
+      var result = 0;
+      for(var i = 0; i < args.length; i++){
+        result += args[i];
+      }
+      return result;
+    })
 
     graph.insert(node1, 'add');
     graph.insert(node2, 'concat');
     graph.insert(node3, 'square');
+    graph.insert(node4, 'sum');
     window.graph = graph;
     // end beforeEach
   });

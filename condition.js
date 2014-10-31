@@ -1,6 +1,6 @@
 var Condition = function(){
   var args = Array.prototype.slice.call(arguments);
-  this.length = args.shift();
+  this.length = (typeof args[0] === 'number') ? args.shift() : undefined;
   this.types = args;
   this.func = undefined;
 }
@@ -10,9 +10,10 @@ Condition.prototype.addFunc = function(func){
 }
 
 Condition.prototype.check = function(args){
-  if(this.length && args.length !== this.length){
+  if (this.length && args.length !== this.length) {
     return false;
-  } else {
+  } 
+  else if (this.types.length) {
     var argument, type;
     for(var i = 0; i < args.length; i++){ // this should be replaced by deep equals
       argument = args[i];
@@ -21,6 +22,6 @@ Condition.prototype.check = function(args){
         return false;
       }
     }
-    return this.func ? this.func(args) : true;
   }
+  return this.func ? this.func(args) : true;
 }

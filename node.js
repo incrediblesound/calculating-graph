@@ -11,10 +11,5 @@ Node.prototype.addEdge = function(node){
 
 Node.prototype.input = function(args){
   var result;
-  if(this.condition.check(args)){
-    result = this.func(args);
-    return result;
-  } else {
-    return false;
-  }
+  return (this.condition.check(args)) ? this.func(args) : false
 }
