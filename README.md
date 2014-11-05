@@ -134,3 +134,22 @@ square: [ { from: 'add', value: 36 }, false ]
 }
 ```
 The return value from add was passed to the square node via the one-way connection, and the result is included in the output object with some additional info about the origin of the input value.
+
+nodeLib
+-------
+I have included a library for initilizing the graph with different kinds of nodes. If you include node_lib.js in your application you may initilize the graph with any of the nodes I have in that library. Currently the following nodes are available: sumTwo, square, sumAll, divideBy, average, sort, max, min, circumference, combinations.
+
+Here is an example of using the library to do some calculations:
+```javascript
+var graph = new Graph();
+graph.init('square','average',['divideBy', 2]);//divideBy takes a number, returns a node that divides by that number
+graph.connect('square','divideBy');
+graph.connect('divideBy','average');
+graph.input(6);
+// returns the following object:
+{
+average: [ 6, {from: 'divideBy', value: 3}, {from: 'square->divideBy', value: 18} ],
+divideBy: [ {from: 'square', value: 18}, 3 ],
+square: [ 36 ]
+}
+```
