@@ -57,7 +57,7 @@ var node = new Node(new Condition(3, 'string', 'string', 'number'), function(arg
 
 Graph
 -----
-The graph has an input function that takes any amount of arguments and passes them into the input function of every node in the graph. The graph acucmulates the outputs in a object which is returned at the end, and stores an object with input types mapped to proportion of false outputs for each node.
+The graph has an input function that takes any amount of arguments and passes them into the input function of every node in the graph. The graph acucmulates the outputs in a object which is returned at the end, and stores a map of inputs and outputs, accessible via the getMap() method, for reference or further development.
 
 Lets say we create three nodes like this:
 
@@ -107,16 +107,16 @@ square: [ false ]
 /// and our graph.getMap() function returns this:
 {
 add: {
-  number: 0,
-  number, number: 1,
+  '3': [ false ],
+  '3,3': [ 6 ]
   },
 concat: {
-  number: 0,
-  number, number: 0
+  '3': [ false ],
+  '3,3': [ false ]
   },
 square: {
-  number: 1,
-  number, number: 0
+  '3': [ 9 ],
+  '3,3': [ false ]
   }
 }
 ```
