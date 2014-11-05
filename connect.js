@@ -24,24 +24,10 @@ Graph.prototype.input = function(){
   var output, secondOutput;
   var self = this;
   var results = {};
-  var storeOutput = function(val, node, from){
-    var key = node.name || node.id
-    if(val === false){
-      self.storeAverage(types, self.map[key], 0);
-    } else {
-      self.storeAverage(types, self.map[key], 1);
-    }
-    results[key] = results[key] || [];
-    if(from){
-      results[key].push({from: from.name || from.id, value: val});
-    } else {
-      results[key].push(val);
-    }
-  }
   forEach(this.nodes, function(node){
     types = self.generateTypes(args);
     output = node.input(args);
-    storeOutput(output, node);
+    self.storeOutput(args, output, node);
     if(!Array.isArray(output)){
       output = [output];
     }
@@ -49,10 +35,21 @@ Graph.prototype.input = function(){
       types = self.generateTypes(output);
       edge = self.getNode(edge);
       secondOutput = edge.input(output);
-      storeOutput(secondOutput, edge, node);
+      self.storeOutput(output, secondOutput, edge, node);
     })
   })
   return results;
+}
+
+Graph.prototype.storeOutput = function(args, val, node, from){
+  var key = node.name || node.id
+  this.map[key] = this.map[key] || {};
+  this.map[key][args] = this.map[key][args] || [];
+  if(from){
+    this.map[key][args].push({from: from.name || from.id, value: val});
+  } else {
+    this.map[key][args].push(val);
+  }
 }
 
 Graph.prototype.generateTypes = function(args){
@@ -63,29 +60,8 @@ Graph.prototype.generateTypes = function(args){
   return result;
 }
 
-Graph.prototype.storeAverage = function(types, store, num){
-  store[types] = store[types] || [];
-  store[types].push(num);
-}
-
-Graph.prototype.getMap = function(){
-  var result = {}, self = this;
-  var keys = Object.keys(this.map)
-  var key;
-  var avg = function(arr){
-    var result = 0;
-    forEach(arr, function(element){
-      result += element;
-    })
-    return result/arr.length;
-  }
-  forEach(this.map, function(store, storeKey){
-    forEach(store, function(typeSet, typeSetKey){
-      result[storeKey] = result[storeKey] || {};
-      result[storeKey][typeSetKey] = avg(typeSet);
-    })
-  })
-  return result;
+Graph.prototype.getMap = function(node){
+  return node ? this.map[node] : this.map;
 }
 
 Graph.prototype.getNode = function(id){
