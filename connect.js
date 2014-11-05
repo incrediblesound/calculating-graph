@@ -27,9 +27,13 @@ Graph.prototype.input = function(){
   var storeResult = function(val, node, from){
     var key = node.name || node.id
     results[key] = results[key] || [];
-    if(from){
+    if(from && val.value === undefined){
       results[key].push({from: from.name || from.id, value: val});
-    } else {
+    } 
+    else if(from && val.value !== undefined){
+      results[key].push({from: val.from + '->' + (from.name || from.id), value: val.value})
+    }
+    else {
       results[key].push(val);
     }
   };
@@ -42,7 +46,7 @@ Graph.prototype.input = function(){
       if(key === node.name || key === node.id){
         forEach(result, function(val){
           if(typeof val === 'object' && val.value !== false){
-            received.push(val.value);
+            received.push(val);
           }
         })
       }
@@ -56,7 +60,12 @@ Graph.prototype.input = function(){
       edge = self.getNode(edge);
       forEach(output, function(outputVal){
         if(outputVal !== false){
-          secondOutput = edge.input([outputVal]);
+          if(outputVal.value === undefined){
+            secondOutput = edge.input([outputVal]);
+          } else {
+            secondOutput = outputVal;
+            secondOutput.value = edge.input([outputVal.value]);
+          }
           storeResult(secondOutput, edge, node);
           self.storeOutput(outputVal, secondOutput, edge, node);
         }
@@ -72,7 +81,11 @@ Graph.prototype.storeOutput = function(args, val, node, from){
   this.map[key][args] = this.map[key][args] || [];
   if(from){
     this.map[key][args].push({from: from.name || from.id, value: val});
-  } else {
+  } 
+  else if (from && val.from !== undefined){
+    this.map[key][args].push({from: val.from + '->' + (from.name || from.id), value: val.value})
+  }
+  else {
     this.map[key][args].push(val);
   }
 }
