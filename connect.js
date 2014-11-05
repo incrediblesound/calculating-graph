@@ -20,7 +20,7 @@ Graph.prototype.connect = function(source, target){
 
 Graph.prototype.input = function(){
   var args = Array.prototype.slice.call(arguments);
-  var types;
+  var types, received = [];
   var output, secondOutput;
   var self = this;
   var results = {};
@@ -38,15 +38,29 @@ Graph.prototype.input = function(){
     output = node.input(args);
     storeResult(output, node);
     self.storeOutput(args, output, node);
+    forEach(results, function(result, key){
+      if(key === node.name || key === node.id){
+        forEach(result, function(val){
+          if(typeof val === 'object' && val.value !== false){
+            received.push(val.value);
+          }
+        })
+      }
+    })
     if(!Array.isArray(output)){
       output = [output];
     }
+    output = output.concat(received);
     forEach(node.edges, function(edge){
       types = self.generateTypes(output);
       edge = self.getNode(edge);
-      secondOutput = edge.input(output);
-      storeResult(secondOutput, edge, node);
-      self.storeOutput(output, secondOutput, edge, node);
+      forEach(output, function(outputVal){
+        if(outputVal !== false){
+          secondOutput = edge.input([outputVal]);
+          storeResult(secondOutput, edge, node);
+          self.storeOutput(outputVal, secondOutput, edge, node);
+        }
+      })
     })
   })
   return results;

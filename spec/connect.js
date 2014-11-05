@@ -13,11 +13,10 @@ describe('connect()', function () {
         var b = args[1];
         return a + b;
       })
-    node2 = new Node(new Condition(2, 'string', 'string'),
+    node2 = new Node(new Condition(1, 'number'),
       function(args){
         var a = args[0];
-        var b = args[1];
-        return a.concat(b);
+        return (a/2);
       })
     node3 = new Node(new Condition(1, 'number'),
       function(args){
@@ -27,18 +26,21 @@ describe('connect()', function () {
     node3.condition.addFunc(function(args){
       return (args[0] < 10);
     })
-    node4 = new Node(new Condition('number'), function(args){
-      var result = 0;
+    node4 = new Node(new Condition(), function(args){
+      var result = '';
       for(var i = 0; i < args.length; i++){
         result += args[i];
+        if(i !== args.length){
+          result += ' ';
+        }
       }
       return result;
     })
 
     graph.insert(node1, 'add');
-    graph.insert(node2, 'concat');
     graph.insert(node3, 'square');
-    graph.insert(node4, 'sum');
+    graph.insert(node2, 'divide');
+    graph.insert(node4, 'stringify');
     window.graph = graph;
     // end beforeEach
   });
