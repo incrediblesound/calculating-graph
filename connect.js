@@ -13,6 +13,22 @@ Graph.prototype.insert = function(node, name){
   this.count++;
 }
 
+Graph.prototype.init = function(){
+  var nodes = Array.prototype.slice.call(arguments);
+  var self = this;
+  forEach(nodes, function(node){
+    if(Array.isArray(node)){
+      var nodeName = node[0];
+      var arg = node[1];
+      var nodeObj = nodeLib[nodeName](arg);
+      self.insert(nodeObj, nodeName);
+    } else {
+      var nodeObj = nodeLib[node]();
+      self.insert(nodeObj, node)
+    }
+  })
+}
+
 Graph.prototype.connect = function(source, target){
   sourceNode = this.getNode(source);
   sourceNode.addEdge(target);
